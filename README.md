@@ -74,3 +74,19 @@ that it retrieves more relevant documents than the lexical approaches.
 In a RAG pipeline, this higher retrieval quality provides the language
 model with better context, leading to more accurate and reliable
 generated answers.
+
+## System-Level Explanation of the RAG Workflow
+
+Retrieval-Augmented Generation (RAG) relies on a critical two-stage pipeline: **retrieval followed by generation**. 
+
+First, the **retriever** searches the database to select the top-k most relevant documents based on the user's query. Next, these selected documents are injected into the prompt and passed to a Large Language Model (the **generator**). The generator uses this retrieved context to synthesize a factual, grounded answer. This architecture is what powers leading real-world systems like **Perplexity**, **GitHub Copilot**, and **ChatGPT**, allowing them to answer questions based on external, up-to-date knowledge rather than just their training weights.
+
+### Tying Retrieval Metrics to Generation Quality
+The quality of the final generated answer is entirely dependent on the retriever's accuracy. If the retriever fails to fetch the right documents, the generator will produce a poor or hallucinated answer. 
+
+Looking at our performance table, we can see exactly why the evolution from keyword search to semantic search is critical for downstream RAG quality:
+* **BM25 (Keyword Search):** With a Recall@5 of **0.7266**, it performs decently but relies on exact lexical matches. If the user query uses synonyms, BM25 might fail to retrieve the necessary context, leaving the LLM to guess.
+* **Word2Vec (Early Semantic):** At a Recall@5 of **0.5032**, it struggles with complex phrases and out-of-vocabulary words, providing the weakest context for the generator.
+* **Transformers (Semantic Search):** Achieves the highest Recall@5 of **0.9298** by capturing true contextual meaning in dense vector spaces. 
+
+Because the Transformer improves Recall@5 by over 20% compared to BM25, it guarantees that the generator receives the correct context in the top 5 results ~93% of the time. Better retrieval means better context, which directly translates to a vastly superior and more reliable generated answer.
